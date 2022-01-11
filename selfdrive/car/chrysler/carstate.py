@@ -14,10 +14,31 @@ class CarState(CarStateBase):
   
   def update(self, cp, cp_cam):
 
-    ret = car.CarState.new_message() 
-  
-  # car speed
-    ret.vEgoRaw = cp.vl["ESP_8"]["Vehicle_Speed"] * CV.KPH_TO_MS
+    ret = car.CarState.new_message()
+
+    self.frame = int(cp.vl["EPS_STATUS"]["COUNTER"])
+
+    ret.doorOpen = any([cp.vl["DOORS"]["DOOR_OPEN_FL"],
+                        cp.vl["DOORS"]["DOOR_OPEN_FR"],
+                        cp.vl["DOORS"]["DOOR_OPEN_RL"],
+                        cp.vl["DOORS"]["DOOR_OPEN_RR"]])
+    ret.seatbeltUnlatched = cp.vl["SEATBELT_STATUS"]["SEATBELT_DRIVER_UNLATCHED"] == 1
+
+    ret.brakePressed = cp.vl["BRAKE_2"]["BRAKE_PRESSED_2"] == 5  # human-only
+    ret.brake = 0
+    ret.gas = cp.vl["ACCEL_GAS_134"]["ACCEL_134"]
+    ret.gasPressed = ret.gas > 1e-5
+
+    ret.espDisabled = (cp.vl["TRACTION_BUTTON"]["TRACTION_OFF"] == 1)
+
+    ret.wheelSpeeds = self.get_wheel_speeds(
+      cp.vl["WHEEL_SPEEDS"]["WHEEL_SPEED_FL"],
+      cp.vl["WHEEL_SPEEDS"]["WHEEL_SPEED_FR"],
+      cp.vl["WHEEL_SPEEDS"]["WHEEL_SPEED_RL"],
+      cp.vl["WHEEL_SPEEDS"]["WHEEL_SPEED_RR"],
+      unit=1,
+    )
+    ret.vEgoRaw = (cp.vl["SPEED_1"]["SPEED_LEFT"] + cp.vl["SPEED_1"]["SPEED_RIGHT"]) / 2.
     ret.vEgo, ret.aEgo = self.update_speed_kf(ret.vEgoRaw)
     ret.standstill = not ret.vEgoRaw > 0.001
     ret.wheelSpeeds.fl = cp.vl["ESP_6"]["Wheel_RPM_Front_Left"]
