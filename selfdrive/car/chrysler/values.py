@@ -142,30 +142,37 @@ FW_VERSIONS = {
     (Ecu.combinationMeter, 0x742, None): [
       b'68492693AD',
       b'68525485AB', #TODO: CHECK in newest updat on dongle 5c05760b592aee2c
+      b'68361606AH',
     ],
     (Ecu.srs, 0x744, None): [
       b'68428503AA',
       b'68428505AA',
+      b'68399794AC',
     ],
     (Ecu.esp, 0x747, None): [
       b'68504022AB',
       b'68530686AB',
+      b'68334977AH',
     ],
     (Ecu.fwdCamera, 0x753, None): [
       b'68484694AE',
       b'04672895AB',
+      b'56029827AG',
     ],
     (Ecu.eps, 0x761, None): [
       b'68507906AB'
+      b'68421036AC',
     ],
     (Ecu.engine, 0x7e0, None): [
       b'M2370131MB',
       b'52421132AF',
+      b'M2421132MB',
     ],
     #(Ecu.transmission, 0x7e1, None): [
     #  b'\xf1\x3200000000XX',  # placeholder
       #b'68504640AC',
       #b'68538041AB',
+      #b'68475153AD',
     #],
     (Ecu.gateway, 0x18DACBF1, None): [
       b'68488419AB',
