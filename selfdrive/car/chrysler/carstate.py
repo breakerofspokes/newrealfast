@@ -17,7 +17,7 @@ CHECK_BUTTONS = {ButtonType.cancel: ["Cruise_Control_Buttons", 'ACC_Cancel'],
                  ButtonType.decelCruise: ["Cruise_Control_Buttons", 'ACC_Decel'],
                  ButtonType.followInc: ["Cruise_Control_Buttons", 'ACC_Distance_Inc'],
                  ButtonType.followDec: ["Cruise_Control_Buttons", 'ACC_Distance_Dec'],
-                 ButtonType.lkasToggle: ["Center_Stack_2", 'LKAS_Button']}
+                 ButtonType.lkasToggle: ["Steering_Column_Commands", 'High_Beam_Lever_Status']}
 
 PEDAL_GAS_PRESSED_XP = [0, 32, 255]
 PEDAL_BRAKE_PRESSED_XP = [0, 24, 255]
@@ -102,7 +102,7 @@ class CarState(CarStateBase):
       ret.cruiseState.nonAdaptive = cp_cam.vl["DAS_4"]["ACC_Activation_Status"] in [1, 2] #1 NormalCCOn and 2 NormalCCSet
       #ret.cruiseState.speedOffset = ret.cruiseState.speed - ret.vEgo
       self.dashboard = cp_cam.vl["DAS_4"]
-      ret.steerError = cp_cam.vl["LKAS_COMMAND"]["LKAS_ERROR"]==1 # TODO: Find another bit to determine the steer error
+      #ret.steerError = cp_cam.vl["LKAS_COMMAND"]["LKAS_ERROR"]==1 # TODO: Find another bit to determine the steer error
       self.autoHighBeamBit = cp_cam.vl["DAS_6"]['Auto_High_Beam'] #Auto High Beam isn't Located in this message on chrysler or jeep currently located in 729 message
       self.lkasbutton = (cp.vl["Center_Stack_2"]["LKAS_Button"] == 1)
       self.acc_2 = cp_cam.vl['DAS_3']
@@ -323,12 +323,12 @@ class CarState(CarStateBase):
         ("ACC_Activation_Status", "DAS_4",0),
         ("ACC_DISTANCE_CONFIG_2", "DAS_4",0),
         ("Auto_High_Beam", "DAS_6",0),
-        ("LKAS_ERROR", "LKAS_COMMAND",0),
+        #("LKAS_ERROR", "LKAS_COMMAND",0),
       ]
       checks += [
         ("DAS_3", 50),
         ("DAS_4", 50),
-        ("LKAS_COMMAND",50),
+        #("LKAS_COMMAND",50),
         ]
 
     return CANParser(DBC[CP.carFingerprint]["pt"], signals, checks, 2)
