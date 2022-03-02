@@ -68,7 +68,7 @@ class CarInterface(CarInterfaceBase):
     if candidate in (CAR.RAM_2500):
       ret.wheelbase = 4.295  # in meters
       ret.steerRatio = 22.5  # just a guess
-      ret.mass = 3405. + STD_CARGO_KG  # kg curb weight 2021 Ram 2500
+      ret.mass = 4472. + STD_CARGO_KG  # kg curb weight 2021 Ram 2500
       ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kiBP = [[0.], [0.,]]
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.14], [0.015,]]
       ret.steerActuatorDelay = 0.1
