@@ -85,7 +85,7 @@ class CarState(CarStateBase):
       ret.steerError = self.steer_state == 4 or (self.steer_state == 0 and ret.vEgo > self.CP.minSteerSpeed)
       
     if self.CP.carFingerprint in (CAR.RAM_1500, CAR.RAM_2500):
-      self.lkasbutton = (cp.vl["Center_Stack_2"]["LKAS_Button"] == 1)
+      self.lkasbutton = (cp.vl["Center_Stack_1"]["LKAS_Button"] == 1)
       if self.lkasbutton ==1 and self.lkasdisabled== 0 and self.lkasbuttonprev == 0:
         self.lkasdisabled = 1
       elif self.lkasbutton ==1 and self.lkasdisabled== 1 and self.lkasbuttonprev == 0:
@@ -145,6 +145,7 @@ class CarState(CarStateBase):
       ("EPS_Motor_Torque", "EPS_2"),#EPS Motor Torque output
       ("Torque_Overlay_Status", "EPS_2"),
       ("Traction_Button", "Center_Stack_1"),#Traction Control Button
+      ("LKAS_Button", "Center_Stack_1"),#LKAS Button
       ("Turn_Signal_Status", "Steering_Column_Commands"),#Blinker 
       ("High_Beam_Lever_Status", "Steering_Column_Commands"),#High Beam Lever
       ("ACC_Accel", "Cruise_Control_Buttons"),#ACC Accel Button
