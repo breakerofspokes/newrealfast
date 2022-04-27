@@ -7,6 +7,7 @@ from opendbc.can.packer import CANPacker
 
 class CarController():
   def __init__(self, dbc_name, CP, VM):
+    self.CP = CP
     self.apply_steer_last = 0
     self.ccframe = 0
     self.prev_frame = -1
@@ -39,22 +40,22 @@ class CarController():
                                                    CS.out.steeringTorqueEps, CarControllerParams)
     self.steer_rate_limited = new_steer != apply_steer
 
-    #moving_fast = CS.out.vEgo > CS.CP.minSteerSpeed  # for status message
+    #moving_fast = CS.out.vEgo > self.CP.minSteerSpeed  # for status message
     #lkas_active = moving_fast and enabled
 
     if self.car_fingerprint not in (CAR.RAM_1500, CAR.RAM_2500):
-      if CS.out.vEgo > (CS.CP.minSteerSpeed - 0.5):  # for command high bit
+      if CS.out.vEgo > (self.CP.minSteerSpeed - 0.5):  # for command high bit
         self.gone_fast_yet = True
       elif self.car_fingerprint in (CAR.PACIFICA_2019_HYBRID, CAR.PACIFICA_2020, CAR.JEEP_CHEROKEE_2019):
-        if CS.out.vEgo < (CS.CP.minSteerSpeed - 3.0):
+        if CS.out.vEgo < (self.CP.minSteerSpeed - 3.0):
           self.gone_fast_yet = False  # < 14.5m/s stock turns off this bit, but fine down to 13.5
           
     elif self.car_fingerprint in (CAR.RAM_1500, CAR.RAM_2500):
-      if CS.out.vEgo > (CS.CP.minSteerSpeed):  # for command high bit
+      if CS.out.vEgo > (self.CP.minSteerSpeed):  # for command high bit
         self.gone_fast_yet = True
-      elif CS.out.vEgo < (CS.CP.minSteerSpeed - 0.5):
+      elif CS.out.vEgo < (self.CP.minSteerSpeed - 0.5):
         self.gone_fast_yet = False   
-      #self.gone_fast_yet = CS.out.vEgo > CS.CP.minSteerSpeed
+      #self.gone_fast_yet = CS.out.vEgo > self.CP.minSteerSpeed
 
     if self.gone_fast_yet_previous == True and self.gone_fast_yet == False:
         self.lkaslast_frame = self.lkasframe
@@ -62,7 +63,7 @@ class CarController():
     #if CS.out.steerError is True: #possible fix for LKAS error Plan to test
     #  gone_fast_yet = False
 
-    if (CS.out.steerError is True) or (CS.lkasdisabled is 1) or (self.lkasframe-self.lkaslast_frame<400):#If the LKAS Control bit is toggled too fast it can create and LKAS error
+    if (CS.out.steerFaultPermanent is True) or (CS.lkasdisabled is 1) or (self.lkasframe-self.lkaslast_frame<400):#If the LKAS Control bit is toggled too fast it can create and LKAS error
       self.gone_fast_yet = False
 
     lkas_active = self.gone_fast_yet and enabled
