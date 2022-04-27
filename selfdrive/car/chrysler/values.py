@@ -1,4 +1,7 @@
+from typing import Dict, List, Union
+
 from selfdrive.car import dbc_dict
+from selfdrive.car.docs_definitions import CarInfo
 from cereal import car
 Ecu = car.CarParams.Ecu
 
@@ -19,6 +22,16 @@ class CAR:
   JEEP_CHEROKEE_2019 = "JEEP GRAND CHEROKEE 2019" # includes 2020 Trailhawk
   RAM_1500 = "Ram 1500 Limited, Laramie, TRX and others"
   RAM_2500 = "Ram 2500 Limited"
+
+
+CAR_INFO: Dict[str, Union[CarInfo, List[CarInfo]]] = {
+  CAR.PACIFICA_2017_HYBRID: CarInfo("Chrysler Pacifica Hybrid 2017-18", "Adaptive Cruise"),
+  CAR.PACIFICA_2019_HYBRID: CarInfo("Chrysler Pacifica Hybrid 2019-21", "Adaptive Cruise"),
+  CAR.PACIFICA_2018: CarInfo("Chrysler Pacifica 2017-18", "Adaptive Cruise"),
+  CAR.PACIFICA_2020: CarInfo("Chrysler Pacifica 2020", "Adaptive Cruise"),
+  CAR.JEEP_CHEROKEE: CarInfo("Jeep Grand Cherokee 2016-18", "Adaptive Cruise", "https://www.youtube.com/watch?v=eLR9o2JkuRk"),
+  CAR.JEEP_CHEROKEE_2019: CarInfo("Jeep Grand Cherokee 2019-20", "Adaptive Cruise", "https://www.youtube.com/watch?v=jBe4lWnRSu4"),
+}
 
 # Unique CAN messages:
 # Only the hybrids have 270: 8
