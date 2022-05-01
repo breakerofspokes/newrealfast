@@ -35,19 +35,35 @@ class CarInterface(CarInterfaceBase):
       ret.wheelbase = 3.88  # 2021 Ram 1500
       ret.steerRatio = 15.  # just a guess
       ret.mass = 2493. + STD_CARGO_KG  # kg curb weight 2021 Ram 1500
-      ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kiBP = [[0.,25.], [0.,25.]]
-      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.12,0.12], [0.,0.0001]]
-      ret.steerActuatorDelay = 0.15
-      ret.steerRateCost = 0.7  # may need tuning
+      # ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kiBP = [[0.,25.], [0.,25.]]
+      # ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.12,0.12], [0.,0.0001]]
+      # ret.steerActuatorDelay = 0.15
+      # ret.steerRateCost = 0.7  # may need tuning
+      MAX_TORQUE = 3.6
+      ret.lateralTuning.init('torque')
+      ret.lateralTuning.torque.useSteeringAngle = True
+      ret.lateralTuning.torque.kp = 2.0 / MAX_TORQUE
+      ret.lateralTuning.torque.kf = 1.0 / MAX_TORQUE
+      ret.lateralTuning.torque.ki = 0.5 / MAX_TORQUE
+      ret.lateralTuning.torque.friction = 0.001
+      ret.steerActuatorDelay = 0.16
+      ret.steerRateCost = 1.0
       ret.centerToFront = ret.wheelbase * 0.4 # just a guess
       ret.minSteerSpeed = 14.5
 
     if candidate in (CAR.RAM_2500):
       ret.wheelbase = 3.785  # in meters
-      ret.steerRatio = 23  # just a guess
+      ret.steerRatio = 14.5  # just a guess
       ret.mass = 3405. + STD_CARGO_KG  # kg curb weight 2021 Ram 2500
-      ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kiBP = [[0.], [0.,]]
-      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.15], [0.015,]]
+      # ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kiBP = [[0.], [0.,]]
+      # ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.15], [0.015,]]
+      MAX_TORQUE = 3.6
+      ret.lateralTuning.init('torque')
+      ret.lateralTuning.torque.useSteeringAngle = True
+      ret.lateralTuning.torque.kp = 2.0 / MAX_TORQUE
+      ret.lateralTuning.torque.kf = 1.0 / MAX_TORQUE
+      ret.lateralTuning.torque.ki = 0.5 / MAX_TORQUE
+      ret.lateralTuning.torque.friction = 0.001
       ret.steerActuatorDelay = 0.1
       ret.steerRateCost = 0.5  # may need tuning
       ret.centerToFront = ret.wheelbase * 0.38 # calculated from 100% - (front axle weight/total weight)

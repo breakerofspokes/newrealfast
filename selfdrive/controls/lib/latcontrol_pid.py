@@ -4,18 +4,18 @@ from selfdrive.controls.lib.pid import PIDController
 from selfdrive.controls.lib.latcontrol import LatControl, MIN_STEER_SPEED
 from cereal import log
 
-from common.op_params import opParams, LAT_KP_BP, LAT_KP_V, LAT_KI_BP, LAT_KI_V, LAT_KD_BP, LAT_KD_V, LAT_KF
+#from common.op_params import opParams, LAT_KP_BP, LAT_KP_V, LAT_KI_BP, LAT_KI_V, LAT_KD_BP, LAT_KD_V, LAT_KF
 
 class LatControlPID(LatControl):
   def __init__(self, CP, CI, OP=None):
-    if OP is None:
-      OP = opParams()
-    self.op_params = OP
-    super().__init__(CP,CI)
-    kp = (LAT_KP_BP, LAT_KP_V)
-    ki = (LAT_KI_BP, LAT_KI_V)
-    kd = (LAT_KD_BP, LAT_KD_V)
-    kf = LAT_KF
+    # if OP is None:
+    #   OP = opParams()
+    # self.op_params = OP
+    # super().__init__(CP,CI)
+    kp = 0 #(LAT_KP_BP, LAT_KP_V)
+    ki = 0 #(LAT_KI_BP, LAT_KI_V)
+    kd = 0 #(LAT_KD_BP, LAT_KD_V)
+    kf = 0 #LAT_KF
     self.pid = PIDController(kp, ki, kf, kd, pos_limit=1.0, neg_limit=-1.0, isLateral=True)
     self.get_steer_feedforward = CI.get_steer_feedforward_function()
 
