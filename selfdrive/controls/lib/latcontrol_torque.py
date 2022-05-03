@@ -70,6 +70,7 @@ class LatControlTorque(LatControl):
 
       ff = desired_lateral_accel - params.roll * ACCELERATION_DUE_TO_GRAVITY
       # convert friction into lateral accel units for feedforward
+      self.friction = self.op_params.get(FRICTION)
       friction_compensation = interp(desired_lateral_jerk, [-JERK_THRESHOLD, JERK_THRESHOLD], [-self.friction, self.friction])
       ff += friction_compensation / CP.lateralTuning.torque.kf
       output_torque = self.pid.update(error,
