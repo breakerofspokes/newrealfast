@@ -171,6 +171,8 @@ class opParams:
                         MAX_TORQUE: Param(3.6, VT.number, live=True),
                         FRICTION: Param(0.001, VT.number, live=True),
                         STEER_ACT_DELAY: Param(0.16, VT.number, live=True),
+                        STEER_RATE_COST: Param(0.7, VT.number, live=True),
+                        DEVICE_OFFSET: Param(0.0, VT.number, live=True),
                         
                         SHOW_RATE_PARAMS: Param(False, [bool], live=True),
                         ENABLE_RATE_PARAMS: Param(False, [bool], live=True, depends_on=SHOW_RATE_PARAMS),
@@ -338,3 +340,5 @@ STOCK_DELTA_DOWN = 'stock_delta_down'
 STOCK_STEER_MAX = 'stock_steer_max'
 STEER_ACT_DELAY = 'steer_act_delay'
 STEER_RATIO = 'steer ratio'
+STEER_RATE_COST = 'steer_rate_cost'
+DEVICE_OFFSET = 'device_offset'
