@@ -29,7 +29,7 @@ class LatControlTorque(LatControl):
       OP = opParams()
     self.op_params = OP
     super().__init__(CP,CI)
-    kp = 2.0 / self.op_params.get(MAX_TORQUE)
+    kp = 1.0 / self.op_params.get(MAX_TORQUE)
     ki = 0.5 / self.op_params.get(MAX_TORQUE)
     kf = 1.0 / self.op_params.get(MAX_TORQUE)
     kd = 0
