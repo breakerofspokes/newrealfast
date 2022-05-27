@@ -218,9 +218,9 @@ class CarState(CarStateBase):
   def get_cam_can_parser(CP):
     signals = [
       # sig_name, sig_address, default
-      ("LKAS_CONTROL_BIT", "LKAS_COMMAND"),
-      ("COUNTER", "LKAS_COMMAND"),
-      ("LKAS_ERROR", "LKAS_COMMAND"),
+      #("LKAS_CONTROL_BIT", "LKAS_COMMAND"),
+      #("COUNTER", "LKAS_COMMAND"),
+      #("LKAS_ERROR", "LKAS_COMMAND"),
       ("LKAS_LANE_LINES", "DAS_6"),
       ("LKAS_ICON_COLOR", "DAS_6"),
       ("LKAS_Disabled", "DAS_6"),
@@ -228,7 +228,7 @@ class CarState(CarStateBase):
       ("LKAS_ALERTS", "DAS_6"),
     ]
     checks = [
-      ("LKAS_COMMAND", 50),
+      #("LKAS_COMMAND", 50),
       ("DAS_6", 15),
     ]
 
