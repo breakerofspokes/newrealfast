@@ -53,9 +53,9 @@ class CarInterface(CarInterfaceBase):
       ret.minSteerSpeed = 14.5
 
     if candidate in (CAR.RAM_2500):
-      ret.wheelbase = 3.785  # in meters
+      ret.wheelbase = 4.2926  # in meters
       ret.steerRatio = 15.61  # ACTUAL OVERALL VALUE FROM RAM
-      ret.mass = 3405. + STD_CARGO_KG  # kg curb weight 2021 Ram 2500
+      ret.mass = 4490. + STD_CARGO_KG  # kg curb weight 2021 Ram 2500
       # ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kiBP = [[0.], [0.,]]
       # ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.15], [0.015,]]
       MAX_LAT_ACCEL = 1.4
@@ -68,7 +68,7 @@ class CarInterface(CarInterfaceBase):
       ret.lateralTuning.torque.friction = 0.05
       ret.steerActuatorDelay = 0.1
       ret.steerRateCost = 0.5  # may need tuning
-      ret.centerToFront = ret.wheelbase * 0.38 # calculated from 100% - (front axle weight/total weight)
+      ret.centerToFront = ret.wheelbase * 0.28 # calculated from 100% - (front axle weight/total weight)
       ret.minSteerSpeed = 16.0
 
 
