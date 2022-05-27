@@ -66,8 +66,8 @@ class CarInterface(CarInterfaceBase):
       ret.lateralTuning.torque.ki = 0.1 / MAX_LAT_ACCEL
       ret.lateralTuning.torque.kd = 0 #5.0 / MAX_LAT_ACCEL
       ret.lateralTuning.torque.friction = 0.05
-      ret.steerActuatorDelay = 0.1
-      ret.steerRateCost = 0.5  # may need tuning
+      ret.steerActuatorDelay = 0.25
+      ret.steerRateCost = 0.35  # may need tuning
       ret.centerToFront = ret.wheelbase * 0.28 # calculated from 100% - (front axle weight/total weight)
       ret.minSteerSpeed = 16.0
 
