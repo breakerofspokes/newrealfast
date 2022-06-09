@@ -52,7 +52,7 @@ class CarInterface(CarInterfaceBase):
       FRICTION = .05
       ret.steerActuatorDelay = 0.1
       ret.steerRateCost = 1.0  # may need tuning
-      ret.centerToFront = ret.wheelbase * 0.38 # calculated from 100% - (front axle weight/total weight)
+      ret.centerToFront = ret.wheelbase * 0.29 # calculated from 100% - (front axle weight/total weight)
       ret.minSteerSpeed = 16.0
       set_torque_tune(ret.lateralTuning, MAX_LAT_ACCEL, FRICTION)
 
