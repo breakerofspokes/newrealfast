@@ -44,18 +44,17 @@ class CarInterface(CarInterfaceBase):
       ret.minSteerSpeed = 14.5
       set_torque_tune(ret.lateralTuning, MAX_LAT_ACCEL, FRICTION)
 
-    # TODO: start from empirically derived lateral slip stiffness for the civic and scale by
     # mass and CG position, so all cars will have approximately similar dyn behaviors
     ret.tireStiffnessFront, ret.tireStiffnessRear = scale_tire_stiffness(ret.mass, ret.wheelbase, ret.centerToFront)
 
     if candidate in (CAR.RAM_2500):
-      front_stiffness = 1. # want to change these so that front / rear stiffness ratio is learned at ~1.0
-      rear_stiffness = 1.
+      front_stiffness = .45 # want to change these so that front / rear stiffness ratio is learned at ~1.0
+      rear_stiffness = .45
       ret.wheelbase = 4.3  # in meters
       ret.steerRatio = 15.61  # just a guess
       ret.mass = 4490. + STD_CARGO_KG  # kg curb weight 2021 Ram 2500
-      MAX_LAT_ACCEL = 1.0
-      FRICTION = .03
+      MAX_LAT_ACCEL = 1.175
+      FRICTION = .0018
       ret.steerActuatorDelay = 0.1
       ret.steerRateCost = 1.0  # may need tuning
       ret.centerToFront = ret.wheelbase * 0.29 # calculated from 100% - (front axle weight/total weight)
