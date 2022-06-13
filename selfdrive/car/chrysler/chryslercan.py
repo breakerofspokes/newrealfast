@@ -98,7 +98,6 @@ def create_lkas_command(packer, apply_steer, moving_fast, frame):
   }
   return packer.make_can_msg("LKAS_COMMAND", 0, values)
 
-
 def create_wheel_buttons(packer, frame, fingerprint, cancel = False, acc_resume = False):
   # Cruise_Control_Buttons Message sent to cancel ACC.
   values = {
@@ -112,3 +111,24 @@ def create_wheel_buttons(packer, frame, fingerprint, cancel = False, acc_resume 
     bus = 0 
 
   return packer.make_can_msg("Cruise_Control_Buttons", bus, values)
+
+def create_speed_spoof (packer, esp8, spoofspeed):
+  # create ESP_8 message
+  values =  esp8.copy()
+  values["Vehicle_Speed"] = spoofspeed
+
+  # values = {
+  #   "Vehicle_Speed": 39, 
+  #   "COUNTER": frame % 0x10,
+  # }
+
+  return packer.make_can_msg("ESP_8", 1, values)
+
+def create_lkas_command_1(packer, apply_steer, moving_fast, frame):
+  # LKAS_COMMAND Lane-keeping signal to turn the wheel.
+  values = {
+    "LKAS_STEERING_TORQUE": apply_steer,
+    "LKAS_CONTROL_BIT": int(moving_fast),
+    "COUNTER": frame % 0x10,
+  }
+  return packer.make_can_msg("LKAS_COMMAND", 1, values)
