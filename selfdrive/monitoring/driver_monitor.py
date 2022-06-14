@@ -299,24 +299,24 @@ class DriverStatus():
     standstill_exemption = standstill and self.awareness - self.step_change <= self.threshold_prompt
     certainly_distracted = self.driver_distraction_filter.x > 0.63 and self.driver_distracted and self.face_detected
     maybe_distracted = self.hi_stds > self.settings._HI_STD_FALLBACK_TIME or not self.face_detected
-    if certainly_distracted or maybe_distracted:
+#    if certainly_distracted or maybe_distracted:
       # should always be counting if distracted unless at standstill and reaching orange
-      if not standstill_exemption:
-        self.awareness = max(self.awareness - self.step_change, -0.1)
+#      if not standstill_exemption:
+#        self.awareness = max(self.awareness - self.step_change, -0.1)
 
     alert = None
-    if self.awareness <= 0.:
+#    if self.awareness <= 0.:
       # terminal red alert: disengagement required
-      alert = EventName.driverDistracted if self.active_monitoring_mode else EventName.driverUnresponsive
-      self.terminal_time += 1
-      if awareness_prev > 0.:
-        self.terminal_alert_cnt += 1
-    elif self.awareness <= self.threshold_prompt:
+#      alert = EventName.driverDistracted if self.active_monitoring_mode else EventName.driverUnresponsive
+#      self.terminal_time += 1
+#      if awareness_prev > 0.:
+#        self.terminal_alert_cnt += 1
+#    elif self.awareness <= self.threshold_prompt:
       # prompt orange alert
-      alert = EventName.promptDriverDistracted if self.active_monitoring_mode else EventName.promptDriverUnresponsive
-    elif self.awareness <= self.threshold_pre:
+#      alert = EventName.promptDriverDistracted if self.active_monitoring_mode else EventName.promptDriverUnresponsive
+#    elif self.awareness <= self.threshold_pre:
       # pre green alert
-      alert = EventName.preDriverDistracted if self.active_monitoring_mode else EventName.preDriverUnresponsive
+#      alert = EventName.preDriverDistracted if self.active_monitoring_mode else EventName.preDriverUnresponsive
 
     if alert is not None:
       events.add(alert)

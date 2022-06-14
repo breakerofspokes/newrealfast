@@ -50,8 +50,8 @@ class CarInterface(CarInterfaceBase):
       stiffnessFactor = 0.45
       ret.steerRatio = 15.61  # just a guess
       ret.mass = 4490. + STD_CARGO_KG  # kg curb weight 2021 Ram 2500
-      MAX_LAT_ACCEL = 1.175
-      FRICTION = .0018
+      MAX_LAT_ACCEL = 1.4
+      FRICTION = .00001
       ret.steerActuatorDelay = 0.1
       ret.steerRateCost = 1.0  # may need tuning
       ret.centerToFront = ret.wheelbase * 0.29 # calculated from 100% - (front axle weight/total weight)
