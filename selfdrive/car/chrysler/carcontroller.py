@@ -80,10 +80,7 @@ class CarController:
 
     # LKAS_HEARTBIT is forwarded by Panda so no need to send it here.
     # frame is 50Hz (0.02s period) #Becuase we skip every other frame
-    if self.frame % 25 == 0:  # 0.25s period #must be 12 to acheive .25s instead of 25 because we skip every other frame
-      if CS.lkas_car_model != -1:
-        can_sends.append(create_lkas_hud(self.packer, lkas_active, CC.hudControl.visualAlert, self.hud_count, CS, self.car_fingerprint))
-        self.hud_count += 1
+    
 
     if self.prev_lkas_frame == CS.lkas_counter:
       new_steer = int(round(actuators.steer * CarControllerParams.STEER_MAX))
@@ -103,6 +100,10 @@ class CarController:
       self.gone_fast_yet_previous = self.gone_fast_yet
       can_sends.append(create_lkas_command(self.packer, int(apply_steer), self.gone_fast_yet, CS.lkas_counter))
       can_sends.append(create_lkas_command_1(self.packer, int(apply_steer), self.gone_fast_yet, CS.lkas_counter))
+      if self.frame % 12 == 0:  # 0.25s period #must be 12 to acheive .25s instead of 25 because we skip every other frame
+        if CS.lkas_car_model != -1:
+          can_sends.append(create_lkas_hud(self.packer, lkas_active, CC.hudControl.visualAlert, self.hud_count, CS, self.car_fingerprint))
+          self.hud_count += 1
 
     if self.espcounterlast != CS.esp8counter:
       can_sends.append(create_speed_spoof(self.packer, CS.esp8, self.spoofspeed))   
