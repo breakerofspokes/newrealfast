@@ -115,6 +115,7 @@ def create_wheel_buttons(packer, frame, fingerprint, cancel = False, acc_resume 
 def create_speed_spoof (packer, esp8, spoofspeed):
   # create ESP_8 message
   values =  esp8.copy()
+  values["COUNTER"] += 1
   values["Vehicle_Speed"] = spoofspeed
 
   # values = {
