@@ -43,8 +43,11 @@ class CarController:
     self.steer_rate_limited = new_steer != apply_steer
 
     #moving_fast = CS.out.vEgo > self.CP.minSteerSpeed  # for status message
-    if (self.spoofspeed <63):
-      self.spoofspeed += 1
+    if not CS.esp8stopped:
+      if (self.spoofspeed <63):
+        self.spoofspeed += 1
+    else:
+      self.spoofspeed = 0
       
     if self.car_fingerprint not in (CAR.RAM_1500, CAR.RAM_2500):
       if CS.out.vEgo > (self.CP.minSteerSpeed - 0.5):  # for command high bit
@@ -98,7 +101,7 @@ class CarController:
 
     can_sends.append(create_lkas_command(self.packer, int(apply_steer), self.gone_fast_yet, CS.lkas_counter))
 
-    # can_sends.append(create_speed_spoof(self.packer, CS.esp8, self.spoofspeed))    
+    can_sends.append(create_speed_spoof(self.packer, CS.esp8, self.spoofspeed))    
 
     can_sends.append(create_lkas_command_1(self.packer, int(apply_steer), self.gone_fast_yet, CS.lkas_counter))
 

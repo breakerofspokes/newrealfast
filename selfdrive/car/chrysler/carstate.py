@@ -43,6 +43,7 @@ class CarState(CarStateBase):
     unit=1,
     )
     self.esp8 = cp.vl["ESP_8"]
+    self.esp8stopped = cp.vl["ESP_8"]["STOPPED"]
     #ret.aEgo = cp.vl["ESP_4"]["Acceleration"] #m/s2
     #ret.yawRate = cp.vl["ESP_4"]["Yaw_Rate"] #deg/s
 
@@ -162,6 +163,7 @@ class CarState(CarStateBase):
       ("Left_Rear_Door_Ajar", "BCM_1"),#Driver Rear Door
       ("Right_Rear_Door_Ajar", "BCM_1"),#Passenger Rear Door
       ("Driver_Seatbelt_Status", "ORC_1"), #Driver Sear Belt 
+      ("STOPPED", "ESP_8"),
       ("BRK_PRESSURE", "ESP_8"),
       ("BRAKE_PEDAL", "ESP_8"),
       ("COUNTER", "ESP_8"),#ESP_8 Counter
