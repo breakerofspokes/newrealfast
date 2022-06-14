@@ -44,6 +44,7 @@ class CarState(CarStateBase):
     )
     self.esp8 = cp.vl["ESP_8"]
     self.esp8stopped = cp.vl["ESP_8"]["STOPPED"]
+    self.esp8counter = cp.vl["ESP_8"]["COUNTER"]
     #ret.aEgo = cp.vl["ESP_4"]["Acceleration"] #m/s2
     #ret.yawRate = cp.vl["ESP_4"]["Yaw_Rate"] #deg/s
 

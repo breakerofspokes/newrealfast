@@ -19,6 +19,7 @@ class CarController:
     self.lkaslast_frame = 0.
     self.gone_fast_yet_previous = False
     self.spoofspeed = 0
+    self.espcounterlast = 0
     #self.CarControllerParams = CarControllerParams
     CarControllerParams.STEER_MAX = STEER_MAX_LOOKUP.get(CP.carFingerprint, 1.)
     CarControllerParams.STEER_DELTA_UP = STEER_DELTA_UP.get(CP.carFingerprint, 1.) 
@@ -27,6 +28,9 @@ class CarController:
     self.packer = CANPacker(dbc_name)
 
   def update(self, CC, CS):
+    if self.espcounterlast != CS.esp8counter:
+      can_sends.append(create_speed_spoof(self.packer, CS.esp8, self.spoofspeed))
+      self.espcounterlast = CS.esp8counter    
     # this seems needed to avoid steering faults and to force the sync with the EPS counter
     if self.prev_lkas_frame == CS.lkas_counter:
       new_actuators = CC.actuators.copy()
