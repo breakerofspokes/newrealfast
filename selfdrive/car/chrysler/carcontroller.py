@@ -43,7 +43,7 @@ class CarController:
     self.steer_rate_limited = new_steer != apply_steer
 
     #moving_fast = CS.out.vEgo > self.CP.minSteerSpeed  # for status message
-    if not CS.esp8stopped:
+    if not CS.esp8stopped and CS.out.gearShifter in GearShifter.drive:
       if (self.spoofspeed <63):
         self.spoofspeed += 1
     else:
