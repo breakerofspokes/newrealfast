@@ -19,7 +19,6 @@ class CarController:
     self.lkaslast_frame = 0.
     self.gone_fast_yet_previous = False
     self.spoofspeed = 0
-    self.espcounterlast = -1
     #self.CarControllerParams = CarControllerParams
     CarControllerParams.STEER_MAX = STEER_MAX_LOOKUP.get(CP.carFingerprint, 1.)
     CarControllerParams.STEER_DELTA_UP = STEER_DELTA_UP.get(CP.carFingerprint, 1.) 
@@ -32,11 +31,16 @@ class CarController:
     if self.prev_lkas_frame == CS.lkas_counter:
       new_actuators = CC.actuators.copy()
       new_actuators.steer = self.apply_steer_last / CarControllerParams.STEER_MAX
-      
+      return new_actuators, []
+
     actuators = CC.actuators
 
+
     # steer torque
-    
+    new_steer = int(round(actuators.steer * CarControllerParams.STEER_MAX))
+    apply_steer = apply_toyota_steer_torque_limits(new_steer, self.apply_steer_last,
+                                                   CS.out.steeringTorqueEps, CarControllerParams)
+    self.steer_rate_limited = new_steer != apply_steer
 
     #moving_fast = CS.out.vEgo > self.CP.minSteerSpeed  # for status message
     if not CS.esp8stopped and CS.out.gearShifter in car.CarState.GearShifter.drive:
@@ -67,7 +71,17 @@ class CarController:
     #if CS.out.steerError is True: #possible fix for LKAS error Plan to test
     #  gone_fast_yet = False
 
-    
+    if (self.spoofspeed < 63) or (CS.out.steerFaultPermanent is True) or (CS.lkasdisabled is 1) or (self.frame-self.lkaslast_frame<400):#If the LKAS Control bit is toggled too fast it can create and LKAS error
+      self.gone_fast_yet = 0
+
+    lkas_active = self.gone_fast_yet and CC.enabled 
+
+    if not lkas_active or self.gone_fast_yet_previous == 0:
+      apply_steer = 0
+
+    self.apply_steer_last = apply_steer
+
+    self.gone_fast_yet_previous = self.gone_fast_yet
 
     can_sends = []
 
@@ -80,34 +94,16 @@ class CarController:
 
     # LKAS_HEARTBIT is forwarded by Panda so no need to send it here.
     # frame is 50Hz (0.02s period) #Becuase we skip every other frame
-    
+    if self.frame % 12 == 0:  # 0.25s period #must be 12 to acheive .25s instead of 25 because we skip every other frame
+      if CS.lkas_car_model != -1:
+        can_sends.append(create_lkas_hud(self.packer, lkas_active, CC.hudControl.visualAlert, self.hud_count, CS, self.car_fingerprint))
+        self.hud_count += 1
 
-    if self.prev_lkas_frame == CS.lkas_counter:
-      new_steer = int(round(actuators.steer * CarControllerParams.STEER_MAX))
-      apply_steer = apply_toyota_steer_torque_limits(new_steer, self.apply_steer_last,
-                                                  CS.out.steeringTorqueEps, CarControllerParams)
-      self.steer_rate_limited = new_steer != apply_steer
-      if (self.spoofspeed < 63) or (CS.out.steerFaultPermanent is True) or (CS.lkasdisabled is 1) or (self.frame-self.lkaslast_frame<400):#If the LKAS Control bit is toggled too fast it can create and LKAS error
-        self.gone_fast_yet = 0
+    can_sends.append(create_lkas_command(self.packer, int(apply_steer), self.gone_fast_yet, CS.lkas_counter))
 
-      lkas_active = self.gone_fast_yet and CC.enabled 
+    can_sends.append(create_speed_spoof(self.packer, CS.esp8, self.spoofspeed))    
 
-      if not lkas_active or self.gone_fast_yet_previous == 0:
-        apply_steer = 0
-
-      self.apply_steer_last = apply_steer
-
-      self.gone_fast_yet_previous = self.gone_fast_yet
-      can_sends.append(create_lkas_command(self.packer, int(apply_steer), self.gone_fast_yet, CS.lkas_counter))
-      can_sends.append(create_lkas_command_1(self.packer, int(apply_steer), self.gone_fast_yet, CS.lkas_counter))
-      if self.frame % 12 == 0:  # 0.25s period #must be 12 to acheive .25s instead of 25 because we skip every other frame
-        if CS.lkas_car_model != -1:
-          can_sends.append(create_lkas_hud(self.packer, lkas_active, CC.hudControl.visualAlert, self.hud_count, CS, self.car_fingerprint))
-          self.hud_count += 1
-
-    if self.espcounterlast != CS.esp8counter:
-      can_sends.append(create_speed_spoof(self.packer, CS.esp8, self.spoofspeed))   
-      self.espcounterlast = CS.esp8counter     
+    can_sends.append(create_lkas_command_1(self.packer, int(apply_steer), self.gone_fast_yet, CS.lkas_counter))
 
     self.frame += 1
     self.prev_lkas_frame = CS.lkas_counter
