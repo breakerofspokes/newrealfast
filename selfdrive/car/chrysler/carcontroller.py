@@ -42,8 +42,8 @@ class CarController:
     elif self.car_fingerprint in (CAR.RAM_1500, CAR.RAM_2500):
       if CS.out.vEgo > (self.CP.minSteerSpeed):  # for command high bit
         self.gone_fast_yet = 2 #2 means LKAS enabled
-      elif CS.out.vEgo < (self.CP.minSteerSpeed - 0.5):
-        self.gone_fast_yet = 0   
+      elif CS.out.vEgo < (self.CP.minSteerSpeed):
+        self.gone_fast_yet = 2   
       #self.gone_fast_yet = CS.out.vEgo > self.CP.minSteerSpeed
 
     if self.gone_fast_yet_previous > 0 and self.gone_fast_yet == 0:

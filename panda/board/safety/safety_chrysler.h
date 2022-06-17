@@ -40,8 +40,6 @@ const int RAM_MAX_TORQUE_ERROR = 400;         // since 2 x the rate up from chrs
 #define Cruise_Control_Buttons_HD  570  // Cruise control buttons
 #define Center_Stack_2_HD          650  // Center Stack buttons
 
-void can_send(CANPacket_t *to_push, uint8_t bus_number, bool skip_tx_hook);
-
 const CanMsg CHRYSLER_TX_MSGS[] = {{Cruise_Control_Buttons, 0, 3},{LKAS_COMMAND, 0, 6}, {DAS_6, 0, 8},
   {Cruise_Control_Buttons_RAM, 2, 3}, {LKAS_COMMAND_RAM, 0, 8}, {DAS_6_RAM, 0, 8},
   {Cruise_Control_Buttons_HD, 2, 3}, {LKAS_COMMAND_HD, 0, 8}, {DAS_6_HD, 0, 8}};
@@ -268,20 +266,6 @@ static int chrysler_tx_hook(CANPacket_t *to_send, bool longitudinal_allowed) {
   return tx;
 }
 
-static void send_steer_enable_speed(CANPacket_t *to_fwd_mod){
-  int crc;
-  to_fwd_mod->data[0] = 0;
-  to_fwd_mod->data[1] = 0;
-  to_fwd_mod->data[2] = 0;
-  to_fwd_mod->data[3] = 0;
-  to_fwd_mod->data[4] = 0x20;
-  to_fwd_mod->data[5] = 0x80;
-  to_fwd_mod->data[7] = 0;  //clear speed and Checksum
-  crc = chrysler_compute_checksum(to_fwd_mod);
-  to_fwd_mod->data[7] = crc;   //replace Checksum
-
-}
-
 static int chrysler_fwd_hook(int bus_num, CANPacket_t *to_fwd) {
 
   int bus_fwd = -1;
@@ -291,10 +275,10 @@ static int chrysler_fwd_hook(int bus_num, CANPacket_t *to_fwd) {
   if (bus_num == 0U){
     if (addr == ESP_8){
       bus_fwd = 2;
-      CANPacket_t to_send_mod;
-      to_send_mod.data[6] = to_fwd->data[6];
-      send_steer_enable_speed(&to_send_mod);
-      can_send(&to_send_mod, 1, true);
+      // CANPacket_t to_send_mod;
+      // to_send_mod.data[6] = to_fwd->data[6];
+      // send_steer_enable_speed(&to_send_mod);
+      // can_send(&to_send_mod, 1, true);
     }
     else if (addr == Center_Stack_2_RAM){
       bus_fwd = 1;

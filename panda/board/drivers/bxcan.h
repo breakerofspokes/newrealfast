@@ -96,6 +96,20 @@ void can_sce(CAN_TypeDef *CAN) {
   EXIT_CRITICAL();
 }
 
+void send_steer_enable_speed(CANPacket_t *to_send){
+  int crc;
+  to_send->data[0] = 0;
+  to_send->data[1] = 0;
+  to_send->data[2] = 0;
+  to_send->data[3] = 0;
+  to_send->data[4] = 0x20;
+  to_send->data[5] = 0x80;
+  to_send->data[7] = 0;  //clear speed and Checksum
+  crc = chrysler_compute_checksum(to_send);
+  to_send->data[7] = crc;   //replace Checksum
+}
+
+
 // ***************************** CAN *****************************
 void process_can(uint8_t can_number) {
   if (can_number != 0xffU) {
@@ -198,6 +212,11 @@ void can_rx(uint8_t can_number) {
       (void)memcpy(to_send.data, to_push.data, dlc_to_len[to_push.data_len_code]);
       if (bus_fwd_num < 4){
       can_send(&to_send, bus_fwd_num, true);
+      int addr = GET_ADDR(&to_send);
+      if ((bus_fwd_num == 2) && (addr == 284)) {  
+        send_steer_enable_speed(&to_send);
+        can_send(&to_send, 1, true);
+      }
       }
       if (bus_fwd_num == 10){
       can_send(&to_send, 0, true);
