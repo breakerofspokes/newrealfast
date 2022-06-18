@@ -273,7 +273,7 @@ static int chrysler_fwd_hook(int bus_num, CANPacket_t *to_fwd) {
 
   // forward CAN 0 & 1 -> 2 so stock LKAS camera sees messages
   if (bus_num == 0U){
-    if (addr == ESP_8){
+    if ((addr == ESP_8)|| (addr == ESP_8_RAM) || (addr == ESP_5) || (addr == ESP_5_RAM)) {
       bus_fwd = 2;
       // CANPacket_t to_send_mod;
       // to_send_mod.data[6] = to_fwd->data[6];
