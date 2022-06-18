@@ -16,6 +16,7 @@ const int RAM_MAX_TORQUE_ERROR = 400;         // since 2 x the rate up from chrs
 // Safety-relevant CAN messages for Chrysler/Jeep platforms
 #define EPS_2                      544  // EPS driver input torque
 #define ESP_1                      320  // Brake pedal and vehicle speed
+#define ESP_5                      292
 #define ESP_8                      284  // Brake pedal and vehicle speed
 #define ECM_5                      559  // Throttle position sensor
 #define DAS_3                      500  // ACC engagement states from DASM
@@ -26,6 +27,7 @@ const int RAM_MAX_TORQUE_ERROR = 400;         // since 2 x the rate up from chrs
 // Safety-relevant CAN messages for the 5th gen RAM (DT) platform
 #define EPS_2_RAM                   49  // EPS driver input torque
 #define ESP_1_RAM                  131  // Brake pedal and vehicle speed
+#define ESP_5_RAM                  127
 #define ESP_8_RAM                  121  // Brake pedal and vehicle speed
 #define ECM_5_RAM                  157  // Throttle position sensor
 #define DAS_3_RAM                  153  // ACC engagement states from DASM
