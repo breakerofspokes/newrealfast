@@ -4,12 +4,14 @@ from tqdm import tqdm
 from panda import Panda
 from panda.python.uds import UdsClient, MessageTimeoutError, NegativeResponseError, SESSION_TYPE, DATA_IDENTIFIER_TYPE
 
+
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   parser.add_argument('--rxoffset', default="")
   parser.add_argument('--nonstandard', action='store_true')
   parser.add_argument('--debug', action='store_true')
   parser.add_argument('--addr')
+  parser.add_argument('--bus')
   args = parser.parse_args()
 
   if args.addr:
@@ -25,10 +27,10 @@ if __name__ == "__main__":
   if args.nonstandard:
     for uds_id in range(0xf100,0xf180):
       uds_data_ids[uds_id] = "IDENTIFICATION_OPTION_VEHICLE_MANUFACTURER_SPECIFIC_DATA_IDENTIFIER"
-    for uds_id in range(0xf1a0,0xf1f0):
+    for uds_id in range(0xfde0,0xfdef):
       uds_data_ids[uds_id] = "IDENTIFICATION_OPTION_VEHICLE_MANUFACTURER_SPECIFIC"
-    for uds_id in range(0xf1f0,0xf200):
-      uds_data_ids[uds_id] = "IDENTIFICATION_OPTION_SYSTEM_SUPPLIER_SPECIFIC"
+    # for uds_id in range(0xf1f0,0xf200):
+    #   uds_data_ids[uds_id] = "IDENTIFICATION_OPTION_SYSTEM_SUPPLIER_SPECIFIC"
 
   panda = Panda()
   panda.set_safety_mode(Panda.SAFETY_ELM327)
@@ -39,10 +41,12 @@ if __name__ == "__main__":
       if addr == 0x7df or addr == 0x18db33f1:
         continue
       t.set_description(hex(addr))
-      panda.send_heartbeat()
 
-      bus = 1 if panda.has_obd() else 0
-      rx_addr = addr + int(args.rxoffset, base=16) if args.rxoffset else None
+      if args.bus:
+        bus = int(args.bus)
+      else:
+        bus = 1 if panda.has_obd() else 0
+      rx_addr = addr - 0x280
       uds_client = UdsClient(panda, addr, rx_addr, bus, timeout=0.2, debug=args.debug)
       # Check for anything alive at this address, and switch to the highest
       # available diagnostic session without security access
@@ -57,8 +61,20 @@ if __name__ == "__main__":
 
       # Run queries against all standard UDS data identifiers, plus selected
       # non-standardized identifier ranges if requested
+      sent_again = False
       resp = {}
-      for uds_data_id in sorted(uds_data_ids):
+      for idx, uds_data_id in enumerate(sorted(uds_data_ids)):
+        if idx > 0x50 and not sent_again:
+          try:
+            uds_client.tester_present()
+            uds_client.diagnostic_session_control(SESSION_TYPE.DEFAULT)
+            uds_client.diagnostic_session_control(SESSION_TYPE.EXTENDED_DIAGNOSTIC)
+            sent_again = True
+          except NegativeResponseError:
+            pass
+          except MessageTimeoutError:
+            continue
+
         try:
           data = uds_client.read_data_by_identifier(uds_data_id)  # type: ignore
           if data:
