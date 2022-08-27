@@ -263,9 +263,9 @@ static int chrysler_tx_hook(CANPacket_t *to_send, bool longitudinal_allowed) {
     const bool is_cancel = GET_BYTE(to_send, 0) == 1U;
     const bool is_resume = GET_BYTE(to_send, 0) == 0x10U;
     const bool allowed = is_cancel || (is_resume && controls_allowed);
-    // if (!allowed) {
-    //   tx = 0;
-    // }
+    if (!allowed) {
+      // tx = 0;
+    }
   }
 
   return tx;

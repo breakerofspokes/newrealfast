@@ -20,8 +20,8 @@ LATERAL_ACC_SENSOR_THRESHOLD = 4.0
 
 
 class ParamsLearner:
-  def __init__(self, CP, steer_ratio, stiffness_factor, angle_offset, P_initial=None):
-    self.kf = CarKalman(GENERATED_DIR, steer_ratio, stiffness_factor, angle_offset, P_initial)
+  def __init__(self, CP, stiffness_factor, angle_offset, P_initial=None):
+    self.kf = CarKalman(GENERATED_DIR, stiffness_factor, angle_offset, P_initial)
 
     self.kf.filter.set_global("mass", CP.mass)
     self.kf.filter.set_global("rotational_inertia", CP.rotationalInertia)
