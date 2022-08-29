@@ -24,7 +24,7 @@ const SteeringLimits CHRYSLER_RAM_HD_STEERING_LIMITS = {
   .max_rt_interval = 250000,
   .max_rate_up = 14,
   .max_rate_down = 14,
-  .max_torque_error = 200,
+  .max_torque_error = 400,
   .type = TorqueMotorLimited,
 };
 
@@ -52,6 +52,8 @@ const ChryslerAddrs CHRYSLER_ADDRS = {
   .DAS_6            = 678,  // LKAS HUD and auto headlight control from DASM
   .LKAS_COMMAND     = 658,  // LKAS controls from DASM
   .CRUISE_BUTTONS   = 571,  // Cruise control buttons
+  .CENTER_STACK_1   = 816,  // LKAS Button
+  .CENTER_STACK_2   = 650,  // LKAS Button
 };
 
 // CAN messages for the 5th gen RAM DT platform
@@ -64,6 +66,8 @@ const ChryslerAddrs CHRYSLER_RAM_DT_ADDRS = {
   .DAS_6            = 250,  // LKAS HUD and auto headlight control from DASM
   .LKAS_COMMAND     = 166,  // LKAS controls from DASM
   .CRUISE_BUTTONS   = 177,  // Cruise control buttons
+  .CENTER_STACK_1   = 221,  // LKAS Button
+  .CENTER_STACK_2   = 650,  // LKAS Button
 };
 
 // CAN messages for the 5th gen RAM HD platform
@@ -76,6 +80,8 @@ const ChryslerAddrs CHRYSLER_RAM_HD_ADDRS = {
   .DAS_6            = 629,  // LKAS HUD and auto headlight control from DASM
   .LKAS_COMMAND     = 630,  // LKAS controls from DASM
   .CRUISE_BUTTONS   = 570,  // Cruise control buttons
+  .CENTER_STACK_1   = 816,  // LKAS Button
+  .CENTER_STACK_2   = 650,  // LKAS Button
 };
 
 const CanMsg CHRYSLER_TX_MSGS[] = {
@@ -276,7 +282,8 @@ static int chrysler_fwd_hook(int bus_num, CANPacket_t *to_fwd) {
   int addr = GET_ADDR(to_fwd);
 
   // forward to camera
-  if ((bus_num == 0) && (chrysler_platform != CHRYSLER_PACIFICA) && (addr != chrysler_addrs->CRUISE_BUTTONS)) {
+  const bool is_lkas_button = (addr == chrysler_addrs->CENTER_STACK_1) || (addr == chrysler_addrs->CENTER_STACK_2);
+  if ((bus_num == 0) && ((chrysler_platform != CHRYSLER_PACIFICA) && (addr != chrysler_addrs->CRUISE_BUTTONS)) && !is_lkas_button) {
     bus_fwd = 2;
   }
 
