@@ -40,6 +40,8 @@ typedef struct {
   const int DAS_6;
   const int LKAS_COMMAND;
   const int CRUISE_BUTTONS;
+  const int CENTER_STACK_1;
+  const int CENTER_STACK_2;
 } ChryslerAddrs;
 
 // CAN messages for Chrysler/Jeep platforms
