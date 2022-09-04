@@ -29,7 +29,9 @@ class CarInterface(CarInterfaceBase):
     ret.minSteerSpeed = 3.8  # m/s
     if candidate in (CAR.PACIFICA_2019_HYBRID, CAR.PACIFICA_2020, CAR.JEEP_CHEROKEE_2019):
       # TODO: allow 2019 cars to steer down to 13 m/s if already engaged.
-      ret.minSteerSpeed = 17.5  # m/s 17 on the way up, 13 on the way down once engaged.
+      # ret.minSteerSpeed = 17.5  # m/s 17 on the way up, 13 on the way down once engaged.
+      ret.minSteerSpeed = 0.5
+      ret.minEnableSpeed = 17.5
 
     # Chrysler
     if candidate in (CAR.PACIFICA_2017_HYBRID, CAR.PACIFICA_2018, CAR.PACIFICA_2018_HYBRID, CAR.PACIFICA_2019_HYBRID, CAR.PACIFICA_2020):
@@ -95,17 +97,12 @@ class CarInterface(CarInterfaceBase):
     # events
     events = self.create_common_events(ret, extra_gears=[car.CarState.GearShifter.low])
 
-    if self.CP.carFingerprint in RAM_DT:
-      if self.CS.out.vEgo >= self.CP.minEnableSpeed:
-        self.low_speed_alert = False
-      if (self.CP.minEnableSpeed >= 14.5)  and (self.CS.out.gearShifter != GearShifter.drive) :
-        self.low_speed_alert = True
 
-    else:# Low speed steer alert hysteresis logic
-      if self.CP.minSteerSpeed > 0. and ret.vEgo < (self.CP.minSteerSpeed + 0.5):
-        self.low_speed_alert = True
-      elif ret.vEgo > (self.CP.minSteerSpeed + 1.):
-        self.low_speed_alert = False
+    if self.CS.out.vEgo >= self.CP.minEnableSpeed:
+      self.low_speed_alert = False
+    if (self.CP.minEnableSpeed >= 14.5)  and (self.CS.out.gearShifter != GearShifter.drive) :
+      self.low_speed_alert = True
+
     if self.low_speed_alert:
       events.add(car.CarEvent.EventName.belowSteerSpeed)
 
