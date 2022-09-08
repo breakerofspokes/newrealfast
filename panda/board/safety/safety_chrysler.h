@@ -285,7 +285,7 @@ static int chrysler_fwd_hook(int bus_num, CANPacket_t *to_fwd) {
 
   // forward to camera
   const bool is_ram_cruise = (chrysler_platform != CHRYSLER_PACIFICA) && (addr== chrysler_addrs->CRUISE_BUTTONS);
-  const bool is_lkas_button = (addr == chrysler_addrs->CENTER_STACK_1) || (addr == chrysler_addrs->CENTER_STACK_2);
+  const bool is_lkas_button = (chrysler_platform != CHRYSLER_PACIFICA) && ((addr == chrysler_addrs->CENTER_STACK_1) || (addr == chrysler_addrs->CENTER_STACK_2));
 
   if ((bus_num == 0) && !is_ram_cruise && !is_lkas_button) {
     bus_fwd = 2;
