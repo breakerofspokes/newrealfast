@@ -4,7 +4,7 @@ from common.params import Params
 from opendbc.can.parser import CANParser
 from opendbc.can.can_define import CANDefine
 from selfdrive.car.interfaces import CarStateBase
-from selfdrive.car.chrysler.values import DBC, STEER_THRESHOLD, RAM_CARS
+from selfdrive.car.chrysler.values import DBC, STEER_THRESHOLD, RAM_CARS, RAM_HD_S0
 
 
 class CarState(CarStateBase):
@@ -40,7 +40,9 @@ class CarState(CarStateBase):
     self.prev_cruiseState_enabled = False
     self.prev_acc_mads_combo = None
 
-  def update(self, cp, cp_cam):
+  def update(self, cp, cp_cam, cp_eps):
+
+    cp_steering = cp_eps if self.CP.carFingerprint in RAM_HD_S0 else cp
 
     ret = car.CarState.new_message()
 
@@ -92,8 +94,8 @@ class CarState(CarStateBase):
     # steering wheel
     ret.steeringAngleDeg = cp.vl["STEERING"]["STEERING_ANGLE"] + cp.vl["STEERING"]["STEERING_ANGLE_HP"]
     ret.steeringRateDeg = cp.vl["STEERING"]["STEERING_RATE"]
-    ret.steeringTorque = cp.vl["EPS_2"]["COLUMN_TORQUE"]
-    ret.steeringTorqueEps = cp.vl["EPS_2"]["EPS_TORQUE_MOTOR"]
+    ret.steeringTorque = cp_steering.vl["EPS_2"]["COLUMN_TORQUE"]
+    ret.steeringTorqueEps = cp_steering.vl["EPS_2"]["EPS_TORQUE_MOTOR"]
     ret.steeringPressed = abs(ret.steeringTorque) > STEER_THRESHOLD
 
     # cruise state
@@ -160,9 +162,9 @@ class CarState(CarStateBase):
       if (not self.belowLaneChangeSpeed and (self.leftBlinkerOn or self.rightBlinkerOn)) or\
         not (self.leftBlinkerOn or self.rightBlinkerOn):
         if self.CP.carFingerprint in RAM_CARS:
-          ret.steerFaultTemporary  = cp.vl["EPS_3"]["DASM_FAULT"] == 1
+          ret.steerFaultTemporary  = cp_steering.vl["EPS_3"]["DASM_FAULT"] == 1
         else:
-          ret.steerFaultPermanent = cp.vl["EPS_2"]["LKAS_STATE"] == 4
+          ret.steerFaultPermanent = cp_steering.vl["EPS_2"]["LKAS_STATE"] == 4
 
     # blindspot sensors
     if self.CP.enableBsm:
@@ -214,10 +216,6 @@ class CarState(CarStateBase):
       ("TURN_SIGNALS", "STEERING_LEVERS"),
       ("HIGH_BEAM_PRESSED", "STEERING_LEVERS"),
       ("SEATBELT_DRIVER_UNLATCHED", "ORC_1"),
-      ("COUNTER", "EPS_2",),
-      ("COLUMN_TORQUE", "EPS_2"),
-      ("EPS_TORQUE_MOTOR", "EPS_2"),
-      ("LKAS_STATE", "EPS_2"),
       ("ACC_Cancel", "CRUISE_BUTTONS"),
       ("ACC_Distance_Dec", "CRUISE_BUTTONS"),
       ("ACC_Accel", "CRUISE_BUTTONS"),
@@ -251,15 +249,14 @@ class CarState(CarStateBase):
 
     if CP.carFingerprint in RAM_CARS:
       signals += [
-        ("DASM_FAULT", "EPS_3"),
         ("Vehicle_Speed", "ESP_8"),
+        ("COUNTER", "ESP_8"),
         ("Gear_State", "Transmission_Status"),
         ("LKAS_Button", "Center_Stack_1"),
         ("LKAS_Button", "Center_Stack_2"),
       ]
       checks += [
         ("ESP_8", 50),
-        ("EPS_3", 50),
         ("Transmission_Status", 50),
         ("Center_Stack_1", 1),
         ("Center_Stack_2", 1),
@@ -276,6 +273,26 @@ class CarState(CarStateBase):
       ]
       signals += CarState.get_cruise_signals()[0]
       checks += CarState.get_cruise_signals()[1]
+
+    if CP.carFingerprint not in RAM_HD_S0:
+      signals = [
+      ("COUNTER", "EPS_2",),
+      ("COLUMN_TORQUE", "EPS_2"),
+      ("EPS_TORQUE_MOTOR", "EPS_2"),
+      ("LKAS_STATE", "EPS_2"),
+    ]
+    checks = [
+      ("EPS_2", 100),
+    ]
+
+    if CP.carFingerprint in RAM_CARS:
+      signals += [
+        ("DASM_FAULT", "EPS_3"),
+      ]
+
+      checks += [
+        ("EPS_3", 50),
+        ]
 
     return CANParser(DBC[CP.carFingerprint]["pt"], signals, checks, 0)
 
@@ -297,3 +314,18 @@ class CarState(CarStateBase):
       checks += CarState.get_cruise_signals()[1]
 
     return CANParser(DBC[CP.carFingerprint]["pt"], signals, checks, 2)
+
+  @staticmethod
+  def get_eps_can_parser(CP):
+    signals = [
+      ("COUNTER", "EPS_2",),
+      ("COLUMN_TORQUE", "EPS_2"),
+      ("EPS_TORQUE_MOTOR", "EPS_2"),
+      ("DASM_FAULT", "EPS_3"),
+    ]
+    checks = [
+      ("EPS_2", 100),
+      ("EPS_3", 50),
+    ]
+
+    return CANParser(DBC[CP.carFingerprint]["pt"], signals, checks, 1)

@@ -3,7 +3,7 @@ from cereal import car
 from common.params import Params
 from panda import Panda
 from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness, gen_empty_fingerprint, get_safety_config
-from selfdrive.car.chrysler.values import CAR, DBC, RAM_HD, RAM_DT
+from selfdrive.car.chrysler.values import CAR, DBC, RAM_HD, RAM_DT, RAM_HD_S0
 from selfdrive.car.interfaces import CarInterfaceBase
 
 ButtonType = car.CarState.ButtonEvent.Type
@@ -29,6 +29,8 @@ class CarInterface(CarInterfaceBase):
       ret.safetyConfigs[0].safetyParam |= Panda.FLAG_CHRYSLER_RAM_HD
     elif candidate in RAM_DT:
       ret.safetyConfigs[0].safetyParam |= Panda.FLAG_CHRYSLER_RAM_DT
+    if candidate in RAM_HD_S0:
+      ret.safetyConfigs[0].safetyParam |= Panda.FLAG_CHRYSLER_RAM_HD_S0
 
     ret.minSteerSpeed = 3.8  # m/s
     if candidate in (CAR.PACIFICA_2019_HYBRID, CAR.PACIFICA_2020, CAR.JEEP_CHEROKEE_2019):
@@ -75,7 +77,17 @@ class CarInterface(CarInterfaceBase):
       ret.steerRatio = 15.61
       ret.mass = 3405. + STD_CARGO_KG
       ret.minSteerSpeed = 16
-      CarInterfaceBase.configure_torque_tune(candidate, ret.lateralTuning, 1.0, False)
+      CarInterfaceBase.configure_torque_tune(candidate, ret.lateralTuning, 0.5, False)
+
+    if candidate == CAR.RAM_HD_S0:
+      stiffnessFactor = 0.35
+      ret.steerActuatorDelay = 0.25
+      ret.wheelbase = 3.785
+      ret.steerRatio = 15.61
+      ret.mass = 3405. + STD_CARGO_KG
+      ret.minSteerSpeed = 0.5
+      ret.minEnableSpeed = 16
+      CarInterfaceBase.configure_torque_tune(candidate, ret.lateralTuning, 0.5, False)
 
     else:
       raise ValueError(f"Unsupported car: {candidate}")

@@ -2,8 +2,8 @@ from cereal import car
 from opendbc.can.packer import CANPacker
 from common.realtime import DT_CTRL
 from selfdrive.car import apply_toyota_steer_torque_limits
-from selfdrive.car.chrysler.chryslercan import create_lkas_hud, create_lkas_command, create_cruise_buttons
-from selfdrive.car.chrysler.values import CAR, RAM_CARS, RAM_DT, RAM_HD, CarControllerParams
+from selfdrive.car.chrysler.chryslercan import create_lkas_hud, create_lkas_command, create_cruise_buttons, create_speed_spoof
+from selfdrive.car.chrysler.values import CAR, RAM_CARS, RAM_DT, RAM_HD, RAM_HD_S0, CarControllerParams
 
 GearShifter = car.CarState.GearShifter
 
@@ -18,6 +18,7 @@ class CarController:
     self.last_lkas_falling_edge = 0
     self.lkas_control_bit_prev = False
     self.last_button_frame = 0
+    self.spoofspeed = 0
 
     self.packer = CANPacker(dbc_name)
     self.params = CarControllerParams(CP)
@@ -56,6 +57,11 @@ class CarController:
           lkas_control_bit = True
         if (self.CP.minEnableSpeed >= 14.5) and (CS.out.gearShifter != GearShifter.drive) :
           lkas_control_bit = False
+      elif self.CP.carFingerprint in RAM_HD_S0:
+        if self.spoofspeed >= self.CP.minEnableSpeed:
+          lkas_control_bit = True
+        else:
+          lkas_control_bit = False
       elif CS.out.vEgo > self.CP.minSteerSpeed:
         lkas_control_bit = True
       elif self.CP.carFingerprint in (CAR.PACIFICA_2019_HYBRID, CAR.PACIFICA_2020, CAR.JEEP_CHEROKEE_2019):
@@ -79,12 +85,23 @@ class CarController:
       self.apply_steer_last = apply_steer
       self.lkas_control_bit_prev = lkas_control_bit
 
-      can_sends.append(create_lkas_command(self.packer, self.CP, int(apply_steer), lkas_control_bit))
+      idx = self.frame // 2
+
+      can_sends.append(create_lkas_command(self.packer, self.CP, int(apply_steer), lkas_control_bit, idx, 0))
+      if self.CP.carFingerprint in RAM_HD_S0:
+        if lkas_active and CS.out.vEgoRaw < self.CP.minEnableSpeed: #if lkas is active and below threshold spoof speed 
+          self.spoofspeed = self.CP.minEnableSpeed
+        else:
+          self.spoofspeed = CS.out.vEgoRaw
+        can_sends.append(create_speed_spoof(self.packer, CS.esp8_counter, self.spoofspeed))
+        can_sends.append(create_lkas_command(self.packer, self.CP, int(apply_steer), lkas_control_bit, idx, 1))
 
     # HUD alerts
     if self.frame % 25 == 0:
       if CS.lkas_car_model != -1:
-        can_sends.append(create_lkas_hud(self.packer, self.CP, lkas_active, CS.madsEnabled, CC.hudControl.visualAlert, self.hud_count, CS.lkas_car_model, CS))
+        can_sends.append(create_lkas_hud(self.packer, self.CP, lkas_active, CS.madsEnabled, CC.hudControl.visualAlert, self.hud_count, CS.lkas_car_model, CS, 0))
+        if self.CP.carFingerprint in RAM_HD_S0:
+          can_sends.append(create_lkas_hud(self.packer, self.CP, lkas_active, CS.madsEnabled, CC.hudControl.visualAlert, self.hud_count, CS.lkas_car_model, CS, 1))
         self.hud_count += 1
 
     self.frame += 1
